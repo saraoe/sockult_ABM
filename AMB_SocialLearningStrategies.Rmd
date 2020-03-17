@@ -39,8 +39,6 @@ library(pacman)
 p_load(ggplot2, pracma)
 # Momocs, 
 
-setwd("~/4semester/Social and Cultural/W4 Simulating social interactions (agent-based models)")
-
 ```
 
 
@@ -58,12 +56,12 @@ target_string = c(sample(0:9,15, replace=TRUE))
 data <- simulation(
   N <- 50,
   rounds <- 100,
-  proportion_ind <- 0.8,
-  SL_strategy <- "Best Member"
+  proportion_ind <- 0.2,
+  SL_strategy <- "Conformity"
 )
 
 #Save the df as .csv file 
-write.csv(data,'ind_8_best.csv')
+write.csv(data,'ind_2_con.csv')
 
 
 
@@ -301,7 +299,7 @@ runSocial <- function(df, guesses, round, N, strategy){
           index <- which(prevGuesses == names(table(prevGuesses)[mostFreq]))[1]
           
           #Score
-          freqScore <- prevRound$id[prevRound$id == index]
+          freqScore <- prevRound$score[prevRound$id == index]
           
           #Check whether the score of that guess was higher than your own 
           if (prevScore < freqScore){ #If yes, then use the guess of that agent
@@ -372,7 +370,7 @@ getScore <- function(guess){
 
 
 ```{r}
-p_load(ggplot2, gganimate, patchwork, gifski)
+p_load(ggplot2, gganimate, patchwork, gifski, tidyverse)
 
 #Read files
 bm2 <- read_csv('ind_2_best.csv')
