@@ -1,0 +1,84 @@
+---
+title: "AMB_GenderBias"
+author: "Line Kruse"
+date: "3/8/2020"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+setwd("~/4semester/Social and Cultural/W4 Simulating social interactions (agent-based models)")
+
+library(pacman)
+p_load(dplyr, tibble)
+
+```
+
+A simple agent based model of gender biases
+Consider a lifetime of work for a private company. Every year, you have a chance to get promoted to a higher position. However, for some reason, men and women have a slightly different chance to get promoted every step of the way. How does a small difference explodes?
+
+Using probabilities, we can compute a simple ratio for such gender bias:
+p_man/p_woman
+-> for example: If a man has 0.5 chance to get a promotion and a woman 0.40, we have a ratio of 1.25, which means a man is only 0.25 more likely to get promoted than a woman.
+However, if we want to climb the ladder, we have to get promoted more than once. If we assume the successive promotions to be independent, thus the probabilities to remain the same along the way, then the ratio changes in the following p_man^n_promotion / p_woman^n_promotion.
+->Keeping the example above, assuming you become CEO after 15 promotions, we get 0.5^15 / 0.4^15 = 28.4, which means a man is almost 30 times more likely to become CEO than a woman.
+
+Can we simulate this scenario in an Agent Based Modelling (ABM) Framework?
+  -> It would imply a finite population
+Do we get similar results?
+
+```{r}
+
+promotion <- function(N, p_man, p_woman){
+  
+  # Matrix keeping tracks of promotions
+  data <- as.tibble(matrix(NA,N,16))
+  
+  # add column names
+  colnames(data) <- c("Gender","P1","P2","P3","P4","P5",
+                      "P6","P7","P8","P9","P10","P11","P12","P13","P14","P15")
+  
+  data$Gender <- sample(rep(c("M","F"),N/2),N,replace = FALSE)
+  
+  #If they get promoted or not
+  for(i in 2:16){
+    
+    data[,i] <- ifelse(data$Gender == "M", rbinom(N,1,p_man), rbinom(N,1,p_woman) )
+  }
+  
+  #Sum of promotion
+  data$Sum <- data %>% 
+    select(-Gender) %>% 
+    rowSums()
+  
+  
+  return(data)
+}
+
+
+```
+
+```{r}
+#Run simulation
+data <- promotion(500000, 0.5, 0.4)
+
+#Check N of females and males
+data %>% 
+  group_by(Gender) %>% 
+  count()
+
+#Average promotion
+data %>% 
+  group_by(Gender) %>% 
+  summarise(average_promotion = sum(Sum)/n())
+
+#How many became CEO
+CEO <- data %>% 
+  filter(Sum == 15) %>% 
+  group_by(Gender) %>% 
+  count()
+
+#Ratio of F vs M becomming CEOs --> Will be NA if there are only M being CEO
+CEO[1,2]/CEO[2,2]
+```
+
