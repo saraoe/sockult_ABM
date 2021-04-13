@@ -1,5 +1,5 @@
 # Agent-based models
-_ABM made in W4 of Social and Cultural Dynamics_
+_ABM made in W4 of Social and Cultural Dynamics, Cognitive Science BSc, Aarhus University_
 
 Two different agent-based models:
 - A simple agent-based model of gender biases
